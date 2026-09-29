@@ -1,14 +1,448 @@
-# DBI Referat: Data Modeling {.unnumbered}
+---
+title: "DBI Referat: Data Modeling"
+author: "Dein Name"
+date: "2026-09-29"
+---
 
-Dieses Referat behandelt das Thema **Data Modeling** im Rahmen des Unterrichts Datenbanken und Informationssysteme (DBI). Es werden grundlegende Konzepte, Notationen, Architekturen sowie moderne NoSQL-Modellierungsansätze vorgestellt und miteinander verglichen.
+# DBI Referat: Data Modeling {.center}
 
-## Gliederung
+## Agenda
 
-1. Einführung und Motivation
-2. Drei-Schichten-Architektur
-3. Grundlagen des Entity-Relationship-Modells
-4. ER-Notationen im Vergleich
-5. Erweiterte Konzepte: Beziehungsattribute, ternäre Beziehungen, Generalisierung, Aggregation
-6. Konzeptionelles vs. logisches Modell
-7. NoSQL-Modellierung
-8. Fazit
+- Motivation für Datenmodellierung
+- Drei-Schichten-Architektur
+- ER-Modell und Notationen
+- Erweiterte Konzepte
+- Konzeptionell vs. logisch
+- NoSQL-Modellierung
+- Fazit
+
+::: {.notes}
+Heute geben wir einen kompakten Überblick über Data Modeling im DBI-Unterricht. Die detaillierten Erläuterungen stehen in den Speaker Notes und sollen nicht auf den Folien stehen.
+:::
+
+# Einführung
+
+## Warum ein ERD?
+
+- Visualisierung von Daten und Beziehungen
+- Kommunikationsmittel zwischen Fachbereich und IT
+- Grundlage für das Datenbankschema
+
+::: {.notes}
+Ein Entity-Relationship-Diagramm (ERD) ist ein zentrales Werkzeug beim Datenbankentwurf. Es hilft, Datenstrukturen frühzeitig zu planen, Missverständnisse zu vermeiden und ein gemeinsames Verständnis zwischen Fachbereichen und Entwicklern zu schaffen. Ohne ERD entstehen oft inkonsistente oder schlecht dokumentierte Datenbanken.
+:::
+
+## Was zeigt ein ERD?
+
+| Element | Bedeutung |
+|---------|-----------|
+| Entität | Objekt der realen Welt |
+| Attribut | Eigenschaft |
+| Beziehung | Verbindung |
+| Kardinalität | Anzahl der Beteiligten |
+
+::: {.notes}
+Entitäten sind beispielsweise Kunde, Produkt oder Bestellung. Attribute beschreiben Eigenschaften wie Name, Preis oder Datum. Beziehungen verknüpfen Entitäten miteinander, zum Beispiel „Kunde bestellt Produkt". Kardinalitäten geben an, wie viele Entitäten an einer Beziehung beteiligt sein dürfen.
+:::
+
+## ERD-Beispiel
+
+```{.plantuml caption="Beispiel-ERD für einen Onlineshop"}
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+entity Kunde {
+  * KundenNr : Integer
+  --
+  * Name : String
+  * Email : String
+}
+
+entity Produkt {
+  * ProduktNr : Integer
+  --
+  * Bezeichnung : String
+  * Preis : Decimal
+}
+
+entity Bestellung {
+  * BestellNr : Integer
+  --
+  * Datum : Date
+}
+
+entity Bestellposition {
+  * Menge : Integer
+}
+
+Kunde ||--o{ Bestellung : bestellt
+Bestellung ||--|{ Bestellposition : enthält
+Produkt ||--o{ Bestellposition : enthalten in
+@enduml
+```
+
+::: {.notes}
+Dieses ERD zeigt einen typischen Onlineshop. Ein Kunde kann mehrere Bestellungen aufgeben. Eine Bestellung besteht aus mehreren Bestellpositionen, die jeweils ein Produkt und eine Menge enthalten.
+:::
+
+## Was zeigt ein ERD nicht?
+
+- Prozesse und Abläufe
+- Benutzeroberflächen
+- Technische Implementierung
+
+::: {.notes}
+Ein ERD konzentriert sich auf Datenstrukturen und deren Zusammenhänge. Prozesse und Abläufe werden in Aktivitätsdiagrammen modelliert. Benutzeroberflächen und technische Details wie Indizes oder Partitionierung gehören nicht in das konzeptionelle Modell.
+:::
+
+## Data first vs. Program first
+
+| Data first | Program first |
+|------------|---------------|
+| Strukturen zuerst | Anwendung zuerst |
+| Konsistenz | Agilität |
+| Wiederverwendung | Schnelle Umsetzung |
+
+::: {.notes}
+Beim Data-first-Ansatz werden zuerst die Datenstrukturen modelliert und die Anwendung passt sich an. Das fördert Konsistenz und Wiederverwendung. Beim Program-first-Ansatz entstehen Datenstrukturen aus den Anforderungen der Anwendung. Das ist oft agiler, aber riskanter bezüglich Datenqualität. Klassische Datenbankprojekte folgen meist Data first, NoSQL-Projekte eher Program first.
+:::
+
+# Drei-Schichten-Architektur
+
+## Die drei Ebenen
+
+1. **Externe Ebene** – Benutzersichten
+2. **Konzeptionelle Ebene** – Gesamtsicht (ER-Diagramm)
+3. **Interne Ebene** – Physische Speicherung
+
+::: {.notes}
+Die externe Ebene beschreibt die Sicht einzelner Benutzer oder Anwendungen. Die konzeptionelle Ebene enthält die logische Gesamtsicht aller Daten, typischerweise als ER-Diagramm. Die interne Ebene beschreibt die physische Speicherung mit Tabellen, Indizes und Zugriffspfaden.
+:::
+
+## Architektur-Diagramm
+
+```{.plantuml caption="Drei-Schichten-Architektur"}
+@startuml
+skinparam rectangle {
+    BackgroundColor<<extern>> LightBlue
+    BackgroundColor<<konzept>> LightGreen
+    BackgroundColor<<intern>> LightYellow
+}
+
+rectangle "Externe Ebene\nBenutzer, Anwendungen" as ext <<extern>>
+rectangle "Konzeptionelle Ebene\nER-Diagramm" as konz <<konzept>>
+rectangle "Interne Ebene\nTabellen, Indizes, Dateien" as intern <<intern>>
+
+ext -> konz : verwendet
+konz -> intern : abgebildet auf
+@enduml
+```
+
+::: {.notes}
+Die drei Ebenen sind voneinander getrennt. Änderungen auf einer Ebene wirken sich nur bedingt auf die anderen aus. Das erhöht die Wartbarkeit und Unabhängigkeit vom konkreten Datenbankprodukt.
+:::
+
+## Vorteile der Trennung
+
+- Datenunabhängigkeit
+- Bessere Sicherheit
+- Einfachere Wartung
+
+::: {.notes}
+Durch die Trennung der Ebenen können Änderungen auf einer Ebene isoliert werden. Logische Datenunabhängigkeit bedeutet, dass Änderungen auf der konzeptionellen Ebene externe Sichten nur bedingt beeinflussen. Physische Datenunabhängigkeit bedeutet, dass Änderungen der Speicherung die konzeptionelle Ebene nicht berühren.
+:::
+
+# ER-Grundlagen
+
+## Entitäten und Attribute
+
+- **Entität**: eindeutig identifizierbares Objekt
+- **Attribut**: Eigenschaft einer Entität
+- **Schlüssel**: eindeutige Identifikation
+
+::: {.notes}
+Eine Entität ist ein konkretes Objekt der realen Welt, zum Beispiel ein Kunde mit der Kundennummer 1234. Attribute beschreiben Eigenschaften wie Name, Geburtsdatum oder Adresse. Ein Schlüssel dient zur eindeutigen Identifikation, zum Beispiel die Kundennummer als Primärschlüssel.
+:::
+
+## Arten von Attributen
+
+- Einfach vs. zusammengesetzt
+- Einwertig vs. mehrwertig
+- Abgeleitet
+
+::: {.notes}
+Einfache Attribute sind nicht weiter zerlegbar, zum Beispiel Geburtsdatum. Zusammengesetzte Attribute lassen sich gliedern, wie Adresse in Straße, PLZ und Ort. Mehrwertige Attribute können mehrere Werte annehmen, zum Beispiel Telefonnummern. Abgeleitete Attribute lassen sich aus anderen berechnen, wie das Alter aus dem Geburtsdatum.
+:::
+
+## Kardinalitäten
+
+| Typ | Bedeutung |
+|-----|-----------|
+| 1:1 | eins zu eins |
+| 1:n | eins zu viele |
+| n:m | viele zu viele |
+
+::: {.notes}
+Kardinalitäten geben an, wie viele Entitäten an einer Beziehung beteiligt sein dürfen. Ein Kunde kann viele Bestellungen aufgeben, das ist eine 1:n-Beziehung. Eine Bestellung kann viele Produkte enthalten und ein Produkt kann in vielen Bestellungen vorkommen, das ist eine n:m-Beziehung.
+:::
+
+# ER-Notationen
+
+## Chen-Notation
+
+- Entitäten: Rechtecke
+- Attribute: Ellipsen
+- Beziehungen: Rauten
+- Kardinalitäten: 1, n, m
+
+::: {.notes}
+Die Chen-Notation bietet eine klare Trennung zwischen Entitäten, Beziehungen und Attributen. Sie ist besonders gut für konzeptionelle Modelle geeignet, wird aber in kommerziellen Tools seltener unterstützt und kann bei vielen Entitäten unübersichtlich werden.
+:::
+
+## Crow's Foot
+
+- Strich = 1
+- Krähenfuß = viele
+- Kreis = optional
+
+::: {.notes}
+Crow's Foot ist besonders in Tools wie Microsoft Visio oder draw.io verbreitet. Die krähenfußartigen Symbole machen Kardinalitäten auf einen Blick erkennbar. Attribute werden meist als Listen neben dem Entitätsrechteck dargestellt.
+:::
+
+## Notationen im Vergleich
+
+```{.plantuml caption="Vergleich der Notationen am Beispiel Kunde bestellt Produkt"}
+@startuml
+left to right direction
+
+entity Kunde
+entity Produkt
+
+Kunde "1" -- "n" Produkt : bestellt
+@enduml
+```
+
+::: {.notes}
+Dieses einfache Beispiel zeigt eine 1:n-Beziehung. In der Chen-Notation würde „bestellt" als Raute dargestellt, in Crow's Foot als Linie mit entsprechenden Symbolen, in UML als Assoziation mit Multiplizitäten.
+:::
+
+## UML
+
+- Klassen statt Entitäten
+- Assoziationen statt Beziehungen
+- Multiplizitäten
+
+::: {.notes}
+UML-Klassendiagramme werden oft in der objektorientierten Softwareentwicklung verwendet. Sie unterstützen Vererbung, Assoziationen und Kompositionen direkt und haben eine breite Toolunterstützung. Allerdings sind sie nicht speziell für Datenbanken entwickelt.
+:::
+
+## Vergleich
+
+| Kriterium | Chen | Crow's Foot | UML |
+|-----------|------|-------------|-----|
+| Entitäten | Rechtecke | Rechtecke | Klassen |
+| Attribute | Ellipsen | Listen | Felder |
+| Eignung | Konzeptionell | Praktisch | OO-Projekte |
+
+::: {.notes}
+Jede Notation hat ihre Stärken. Chen ist anschaulich für konzeptionelle Modelle, Crow's Foot ist kompakt und weit verbreitet, UML passt gut in objektorientierte Projekte. Die Wahl hängt vom Kontext und den verwendeten Tools ab.
+:::
+
+# Erweiterte Konzepte
+
+## Beziehungsattribute
+
+- Attribute können Beziehungen zugeordnet werden
+- Beispiel: Menge in „Kunde bestellt Produkt"
+
+::: {.notes}
+Nicht jedes Attribut gehört einer Entität an. Die Menge oder das Bestelldatum sind Eigenschaften der Beziehung zwischen Kunde und Produkt, da sie erst durch die Kombination beider Entitäten einen Sinn ergeben.
+:::
+
+## Ternäre Beziehungen
+
+- Verbinden drei Entitätsmengen
+- Beispiel: Arzt behandelt Patient in Klinik
+
+::: {.notes}
+Manche Zusammenhänge lassen sich nicht sinnvoll in mehrere binäre Beziehungen aufteilen. Ein Arzt behandelt einen Patienten in einer bestimmten Klinik. Erst die Kombination aller drei Entitäten ergibt einen eindeutigen Sachverhalt.
+:::
+
+## Generalisierung & Spezialisierung
+
+- **Generalisierung**: Untertypen zusammenfassen
+- **Spezialisierung**: Obertyp aufteilen
+- Beispiel: Person → Kunde, Mitarbeiter
+
+::: {.notes}
+Generalisierung und Spezialisierung entsprechen dem Vererbungskonzept in der objektorientierten Programmierung. Gemeinsame Attribute wie Name und Adresse verbleiben beim Obertyp Person, spezifische Attribute wie Kundennummer oder Mitarbeiternummer gehören zu den Untertypen.
+:::
+
+## Spezialisierung-Diagramm
+
+```{.plantuml caption="Generalisierung und Spezialisierung"}
+@startuml
+left to right direction
+
+entity Person {
+  * PersonNr
+  --
+  * Name
+  * Adresse
+}
+
+entity Kunde {
+  * KundenNr
+  --
+  * Bonität
+}
+
+entity Mitarbeiter {
+  * Mitarbeiternr
+  --
+  * Gehalt
+}
+
+Person <|-- Kunde
+Person <|-- Mitarbeiter
+@enduml
+```
+
+::: {.notes}
+In diesem Diagramm erben Kunde und Mitarbeiter die Attribute von Person. Die Spezialisierung kann disjunkt sein, wenn eine Person entweder Kunde oder Mitarbeiter ist, oder überlappend, wenn beides gleichzeitig möglich ist.
+:::
+
+## Aggregation & Komposition
+
+- **Aggregation**: schwache Teil-von-Beziehung
+- **Komposition**: starke Teil-von-Beziehung
+
+::: {.notes}
+Bei einer Aggregation können die Teile auch unabhängig vom Ganzen existieren, zum Beispiel Studierende in einer Vorlesung. Bei einer Komposition existieren die Teile nicht ohne das Ganze, zum Beispiel Bestellpositionen ohne Bestellung.
+:::
+
+# Konzeptionell vs. Logisch
+
+## Konzeptionell
+
+- Fachliche Sicht
+- Unabhängig vom DBMS
+- ER-Diagramm
+
+::: {.notes}
+Das konzeptionelle Modell beschreibt die Daten aus fachlicher Sicht. Es enthält keine Angaben zu Datentypen oder Indizes und ist unabhängig von einer konkreten Datenbanktechnologie. Zielgruppe sind Fachexperten und Projektleiter.
+:::
+
+## Logisch
+
+- Konkretes Datenbankschema
+- Tabellen, Spalten, Datentypen
+- Fremdschlüssel
+
+::: {.notes}
+Das logische Modell überführt das konzeptionelle Modell in ein konkretes Datenbankschema. Hier werden Tabellen, Spalten, Datentypen und Schlüssel festgelegt. Beziehungen werden durch Fremdschlüssel abgebildet.
+:::
+
+## Überführung
+
+1. Entitätsmengen → Tabellen
+2. Attribute → Spalten
+3. 1:n → Fremdschlüssel
+4. n:m → eigene Tabelle
+
+::: {.notes}
+Die Überführung vom ER-Modell in das relationale Modell folgt festen Regeln. Jede Entitätsmenge wird zu einer Tabelle, Attribute werden zu Spalten. 1:n-Beziehungen werden durch Fremdschlüssel auf der vielen Seite abgebildet, n:m-Beziehungen benötigen eine eigene Tabelle.
+:::
+
+# NoSQL-Modellierung
+
+## Graph
+
+- Knoten und Kanten
+- Beispiel: Neo4j
+
+::: {.notes}
+Graphdatenbanken eignen sich für stark vernetzte Daten wie soziale Netzwerke, Empfehlungssysteme oder Betrugsaufdeckung. Sie sind sehr performant bei Beziehungsabfragen, aber weniger geeignet für große Mengen unstrukturierter Daten.
+:::
+
+## Dokument
+
+- JSON/BSON-Dokumente
+- Beispiel: MongoDB
+
+::: {.notes}
+Dokumentenorientierte Datenbanken bieten flexible Schemafreiheit und sind gut horizontal skalierbar. Sie eignen sich für Content-Management, E-Commerce-Kataloge und mobile Anwendungen. Nachteilig sind mögliche Redundanzen und eingeschränkte Join-Operationen.
+:::
+
+## Key-Value
+
+- Einfache Schlüssel-Wert-Paare
+- Beispiel: Redis
+
+::: {.notes}
+Key-Value-Datenbanken sind extrem schnell und einfach skalierbar. Sie werden für Caching, Session-Speicherung und Echtzeit-Rankings eingesetzt. Komplexe Abfragen oder Beziehungen zwischen Werten werden nicht unterstützt.
+:::
+
+## XML
+
+- Native XML-Speicherung
+- Beispiel: BaseX
+
+::: {.notes}
+XML-Datenbanken bewahren die Struktur von XML-Dokumenten und unterstützen Abfragen mit XPath oder XQuery. Sie werden in Dokumentenarchiven oder beim standardisierten Datenaustausch eingesetzt, haben aber einen höheren Speicherbedarf.
+:::
+
+## NoSQL-Modelle im Vergleich
+
+```{.plantuml caption="Überblick über NoSQL-Modelle"}
+@startuml
+left to right direction
+
+rectangle "NoSQL-Datenbanken" {
+    (Graph) as graph
+    (Dokument) as doc
+    (Key-Value) as kv
+    (XML) as xml
+}
+
+graph --> (Vernetzte Daten)
+doc --> (Flexible Daten)
+kv --> (Schneller Zugriff)
+xml --> (Strukturierte Dokumente)
+@enduml
+```
+
+::: {.notes}
+Die Wahl des Datenmodells hängt von den Zugriffsmustern und Anforderungen ab. Moderne Anwendungen nutzen häufig eine Kombination aus relationalen und NoSQL-Datenbanken, was als Polyglot Persistence bezeichnet wird.
+:::
+
+## Auswahl des passenden Modells
+
+| Anforderung | Modell |
+|-------------|--------|
+| Vernetzte Daten | Graph |
+| Flexible Daten | Dokument |
+| Hohe Lesegeschwindigkeit | Key-Value |
+| Komplexe Transaktionen | Relational |
+
+::: {.notes}
+Es gibt kein universell bestes Datenmodell. Relationale Datenbanken bleiben für komplexe Transaktionen und konsistente Strukturen erste Wahl. NoSQL-Datenbanken ergänzen sie dort, wo Flexibilität, Skalierbarkeit oder spezielle Zugriffsmuster gefragt sind.
+:::
+
+# Fazit
+
+## Zentrale Erkenntnisse
+
+- ERDs visualisieren Datenstrukturen
+- Notationen haben unterschiedliche Stärken
+- Konzeptionell → logisch → physisch
+- NoSQL ergänzt relationale Datenbanken
+
+::: {.notes}
+Zusammenfassend ist Data Modeling ein fundamentales Hilfsmittel für verständliche, konsistente und wartbare Informationssysteme. Ein gut erstelltes ERD bildet die Grundlage für die spätere Implementierung und erleichtert die Kommunikation zwischen allen Beteiligten.
+:::
+
+## Danke für eure Aufmerksamkeit!
+
+Fragen?

@@ -1,5 +1,7 @@
-/_book/
+/_site/
 /.quarto/
 /.direnv/
 *_files/
 *.quarto_ipynb
+
+**/*.quarto_ipynb

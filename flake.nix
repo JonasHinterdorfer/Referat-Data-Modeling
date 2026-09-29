@@ -34,6 +34,7 @@
           buildInputs = [
             quarto
             pythonEnv
+            pkgs.plantuml
             (pkgs.texliveSmall.withPackages (ps: with ps; [
               lualatex-math
               unicode-math

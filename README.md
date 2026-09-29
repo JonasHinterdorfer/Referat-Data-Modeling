@@ -1,15 +1,15 @@
 # DBI Referat: Data Modeling
 
-Dieses Quarto-Projekt enthält das Referat zum Thema **Data Modeling** für den DBI-Unterricht.
+Dieses Quarto-Projekt enthält ein **Reveal.js-Referat** zum Thema **Data Modeling** für den DBI-Unterricht. Die Folien enthalten kurze Stichpunkte, während ausführliche Erläuterungen in den Speaker Notes hinterlegt sind.
 
 ## Struktur
 
-- `_quarto.yml` – Projektkonfiguration
-- `index.qmd` – Titelseite und Gliederung
-- `chapters/*.qmd` – Kapitel des Referats
-- `flake.nix` – Nix-Flake mit Quarto, Python und LaTeX
+- `_quarto.yml` – Projektkonfiguration (Reveal.js + PDF)
+- `index.qmd` – Gesamte Präsentation mit PlantUML-Diagrammen
+- `flake.nix` – Nix-Flake mit Quarto, Python, PlantUML und LaTeX
 - `.envrc` – direnv-Konfiguration für `nix develop`
 - `requirements.txt` – Python-Pakete
+- `_extensions/pandoc-ext/diagram/` – Quarto-Filter für PlantUML
 
 ## Verwendung
 
@@ -19,11 +19,11 @@ Mit installiertem [Nix](https://nixos.org/download.html) (und aktivierten Flakes
 # Entwicklungsumgebung betreten
 nix develop
 
-# HTML und PDF rendern
+# Reveal.js und PDF rendern
 quarto render
 
-# Nur HTML
-quarto render --to html
+# Nur Reveal.js
+quarto render --to revealjs
 
 # Nur PDF
 quarto render --to pdf
@@ -36,14 +36,14 @@ Wenn [direnv](https://direnv.net/) installiert ist, wird die Umgebung automatisc
 
 ## Automatische Veröffentlichung auf GitHub Pages
 
-Der Workflow `.github/workflows/publish.yml` baut die HTML-Version bei jedem Push auf `main` (oder `master`) und veröffentlicht sie auf GitHub Pages.
+Der Workflow `.github/workflows/publish.yml` baut bei jedem Push auf `main` (oder `master`) die Reveal.js-Präsentation sowie ein PDF und veröffentlicht beides auf GitHub Pages.
+
+Das PDF ist anschließend unter `https://<username>.github.io/<repo-name>/referat.pdf` erreichbar.
 
 Voraussetzungen im Repository:
 
 1. **Settings → Pages → Build and deployment** auf **GitHub Actions** umstellen.
 2. **Settings → Actions → General → Workflow permissions** auf **Read and write permissions** stellen.
-
-Danach ist das Referat unter `https://<username>.github.io/<repo-name>/` erreichbar.
 
 ## Hinweis
 

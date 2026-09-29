@@ -27,14 +27,14 @@ jobs:
       - name: Cache Nix
         uses: DeterminateSystems/magic-nix-cache-action@v8
 
-      - name: Build Quarto site
+      - name: Build Reveal.js and PDF
         run: |
-          nix develop --command quarto render --to html
+          nix develop --command quarto render
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _book
+          path: _site
 
   deploy:
     needs: build

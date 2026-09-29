@@ -1,33 +1,31 @@
 project:
-  type: book
-  output-dir: _book
-  render:
-    - index.qmd
-    - chapters/*.qmd
-
-book:
   title: "DBI Referat: Data Modeling"
-  author: "Dein Name"
-  date: "2026-09-29"
-  chapters:
-    - index.qmd
-    - chapters/01-einleitung.qmd
-    - chapters/02-drei-schichten-architektur.qmd
-    - chapters/03-erd-grundlagen.qmd
-    - chapters/04-erd-notationen.qmd
-    - chapters/05-erweiterte-konzepte.qmd
-    - chapters/06-konzeptionell-vs-logisch.qmd
-    - chapters/07-nosql-modellierung.qmd
-    - chapters/08-fazit.qmd
-
-lang: de
+  type: default
+  output-dir: _site
 
 format:
-  html:
-    theme: cosmo
-    toc: true
+  revealjs:
+    theme: simple
+    slide-level: 2
+    controls: true
+    progress: true
+    history: true
+    center: true
+    transition: slide
+    background-transition: fade
+    slide-number: c/t
+    show-slide-number: all
+    pdf-separate-fragments: false
   pdf:
-    documentclass: scrreprt
+    output-file: referat
+    documentclass: scrartcl
     papersize: a4
     toc: true
     number-sections: true
+
+filters:
+  - diagram
+
+author: "Dein Name"
+date: "2026-09-29"
+lang: de
