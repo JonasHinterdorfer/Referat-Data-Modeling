@@ -24,9 +24,6 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v13
 
-      - name: Cache Nix
-        uses: DeterminateSystems/magic-nix-cache-action@v8
-
       - name: Build Reveal.js and PDF
         run: |
           nix develop --command quarto render
