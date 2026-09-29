@@ -1,0 +1,66 @@
+# ER-Notationen im Vergleich
+
+Es existieren verschiedene Notationen für ER-Diagramme. Sie unterscheiden sich in der Darstellung von Entitäten, Attributen und vor allem Kardinalitäten.
+
+## Chen-Notation
+
+In der **Chen-Notation** werden Entitäten als Rechtecke, Attribute als Ellipsen und Beziehungen als Rauten dargestellt. Kardinalitäten werden direkt an den Verbindungslinien vermerkt (z. B. 1, n, m).
+
+**Beispiel**: Kunde $-\overset{1}{\underline{\qquad}}-$ bestellt $-\overset{n}{\underline{\qquad}}-$ Produkt
+
+### Stärken
+
+- Klare Trennung zwischen Entitäten, Beziehungen und Attributen
+- Gut geeignet für konzeptionelle Modelle
+- Einfach zu lesen bei wenigen Entitäten
+
+### Schwächen
+
+- Diagramme werden bei vielen Entitäten schnell unübersichtlich
+- Wenig verbreitet in kommerziellen Werkzeugen
+
+## Crow’s Foot-Notation (Martin-Notation)
+
+Die **Crow’s Foot-Notation** verwendet Rechtecke für Entitäten und Linien mit speziellen Symbolen für Kardinalitäten. Der Name kommt von der krähenfußartigen Form, die „viele“ darstellt.
+
+| Symbol | Bedeutung |
+|--------|-----------|
+| Einzelner Strich | 1 |
+| Krähenfuß | viele (n) |
+| Kreis | 0 (optional) |
+
+### Stärken
+
+- Sehr verbreitet in Tools wie Microsoft Visio oder draw.io
+- Kompakte Darstellung
+- Schnelle Erfassung der Kardinalitäten
+
+### Schwächen
+
+- Optionalität und Kardinalität können je nach Variante unterschiedlich notiert werden
+- Attribute werden oft nur in Listen neben dem Rechteck dargestellt
+
+## UML-Klassendiagramm
+
+UML-Klassendiagramme können ebenfalls zur Datenmodellierung verwendet werden. Klassen entsprechen Entitäten, Assoziationen entsprechen Beziehungen. Multiplizitäten werden wie in der UML üblich notiert (z. B. `1..*`, `0..1`).
+
+### Stärken
+
+- Nahtlose Integration in die objektorientierte Softwareentwicklung
+- Unterstützt Vererbung, Assoziationen und Kompositionen direkt
+- Breite Toolunterstützung
+
+### Schwächen
+
+- Nicht speziell für Datenbanken entwickelt
+- Kann zu viele Implementierungsdetails suggerieren
+
+## Zusammenfassender Vergleich
+
+| Kriterium | Chen | Crow’s Foot | UML |
+|-----------|------|-------------|-----|
+| Entitäten | Rechtecke | Rechtecke | Klassen |
+| Attribute | Ellipsen | Listen/Text | Felder in Klassen |
+| Beziehungen | Rauten | Linien | Assoziationen |
+| Kardinalitäten | 1, n, m | Symbole | Multiplizitäten |
+| Eignung | Konzeptionell | Praktisch/Tooling | OO-Projekte |

@@ -1,0 +1,49 @@
+# NoSQL-Modellierung
+
+Neben relationalen Datenbanken haben sich verschiedene **NoSQL-Datenbanken** etabliert, die je nach Anwendungsfall unterschiedliche Datenmodelle verwenden.
+
+## Graphdatenbanken
+
+Graphdatenbanken speichern Daten als **Knoten** (Entitäten) und **Kanten** (Beziehungen). Beispiele sind Neo4j und Amazon Neptune.
+
+- **Einsatzgebiete**: Soziale Netzwerke, Empfehlungssysteme, Betrugsaufdeckung
+- **Vorteile**: Sehr performant bei vernetzten Daten, flexible Beziehungsdarstellung
+- **Nachteile**: Weniger geeignet für große Mengen unstrukturierter Daten, spezielle Abfragesprache (z. B. Cypher)
+
+## Dokumentenorientierte Datenbanken
+
+Dokumentenorientierte Datenbanken speichern Daten als selbstbeschreibende Dokumente, meist im JSON- oder BSON-Format. Beispiele sind MongoDB und CouchDB.
+
+- **Einsatzgebiete**: Content-Management, E-Commerce-Kataloge, mobile Anwendungen
+- **Vorteile**: Flexible Schemafreiheit, gute horizontale Skalierbarkeit, natürliche Abbildung objektorientierter Daten
+- **Nachteile**: Redundanz möglich, komplexe Join-Operationen nur eingeschränkt möglich
+
+## Key-Value-Datenbanken
+
+Key-Value-Datenbanken speichern Daten als einfache Schlüssel-Wert-Paare. Beispiele sind Redis und Amazon DynamoDB.
+
+- **Einsatzgebiete**: Caching, Session-Speicherung, Echtzeit-Rankings
+- **Vorteile**: Extrem schnell, einfach horizontal skalierbar
+- **Nachteile**: Keine komplexen Abfragen, keine Beziehungen zwischen Werten
+
+## XML-Datenbanken
+
+XML-Datenbanken speichern XML-Dokumente nativ und ermöglichen Abfragen über XPath oder XQuery.
+
+- **Einsatzgebiete**: Dokumentenarchive, Standarddatenaustausch (z. B. in der Verwaltung oder im Verlagswesen)
+- **Vorteile**: Bewahrung der Dokumentstruktur, standardisierte Abfragesprachen
+- **Nachteile**: Höherer Speicherbedarf, geringere Verbreitung im Webumfeld
+
+## Auswahl eines passenden Datenmodells
+
+| Anforderung | Geeignetes Modell |
+|-------------|-------------------|
+| Stark vernetzte Daten | Graph |
+| Flexible, halbstrukturierte Daten | Dokument |
+| Einfache, hochfrequente Lesezugriffe | Key-Value |
+| Hierarchische Dokumente mit Metadaten | XML |
+| Komplexe Transaktionen und konsistente Strukturen | Relational |
+
+## Nutzen und Grenzen
+
+NoSQL-Datenbanken bieten Flexibilität und Skalierbarkeit, erfordern aber oft sorgfältige Modellierung und Kenntnis der Zugriffsmuster. Sie ersetzen relationale Datenbanken nicht generell, sondern ergänzen sie je nach Anforderungsprofil.

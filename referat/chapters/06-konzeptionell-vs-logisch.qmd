@@ -1,0 +1,57 @@
+# Konzeptionelles vs. logisches Modell
+
+Im Datenbankentwurf unterscheidet man mehrere Abstraktionsebenen. Zwei zentrale Ebenen sind das konzeptionelle und das logische Modell.
+
+## Konzeptionelles Modell
+
+Das **konzeptionelle Modell** beschreibt die Daten aus fachlicher Sicht, unabhängig von einer konkreten Datenbanktechnologie.
+
+- Zielgruppe: Fachexperten, Projektleiter, Datenbankdesigner
+- Notation: ER-Diagramm (z. B. Chen, Crow’s Foot)
+- Fokus: Was soll gespeichert werden und wie hängen die Daten zusammen?
+
+**Merkmale**:
+
+- Keine Angaben zu Datentypen oder Indizes
+- Keine Festlegung auf relationale oder NoSQL-Datenbank
+- Darstellung der fachlichen Zusammenhänge
+
+## Logisches Modell
+
+Das **logische Modell** überführt das konzeptionelle Modell in ein konkretes Datenbankschema, ohne jedoch physische Speicherdetails zu berücksichtigen.
+
+- Zielgruppe: Datenbankentwickler, Entwickler
+- Notation: Relationenschema, Tabellendefinitionen
+- Fokus: Wie werden die Daten in der Datenbank organisiert?
+
+**Merkmale**:
+
+- Festlegung von Tabellen, Spalten, Datentypen und Schlüsseln
+- Umsetzung von Beziehungen durch Fremdschlüssel
+- Normalisierung der Tabellen
+
+## Überführung vom ER-Modell in das relationale Modell
+
+1. Jede Entitätsmenge wird zu einer Tabelle.
+2. Attribute werden zu Spalten.
+3. Der Primärschlüssel wird festgelegt.
+4. 1:n-Beziehungen werden durch Fremdschlüssel auf der „vielen“ Seite abgebildet.
+5. n:m-Beziehungen werden in eine eigene Tabelle aufgelöst.
+6. 1:1-Beziehungen können auf einer der beiden Seiten als Fremdschlüssel abgebildet werden.
+
+## Beispiel
+
+Konzeptionell:
+
+```text
+Kunde -- bestellt -- Produkt
+```
+
+Logisch (relationales Schema):
+
+```text
+Kunde(KundenNr, Name, Email)
+Produkt(ProduktNr, Bezeichnung, Preis)
+Bestellung(BestellNr, Datum, KundenNr)
+Bestellposition(BestellNr, ProduktNr, Menge)
+```

@@ -1,0 +1,5 @@
+/_book/
+/.quarto/
+/.direnv/
+*_files/
+*.quarto_ipynb

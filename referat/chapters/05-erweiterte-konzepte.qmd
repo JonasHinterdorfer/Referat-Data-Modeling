@@ -1,0 +1,33 @@
+# Erweiterte Konzepte
+
+Das klassische ER-Modell wurde um verschiedene Konzepte erweitert, um komplexere Sachverhalte abbilden zu können.
+
+## Beziehungsattribute
+
+Attribute können nicht nur Entitäten, sondern auch Beziehungen zugeordnet werden. Das ist sinnvoll, wenn ein Attribut erst durch die Kombination der beteiligten Entitäten einen Wert erhält.
+
+**Beispiel**: Die Beziehung *bestellt* zwischen Kunde und Produkt kann das Attribut *Menge* oder *Bestelldatum* besitzen, da diese Angaben weder dem Kunden noch dem Produkt allein zugeordnet werden können.
+
+## Ternäre Beziehungen
+
+Eine **ternäre Beziehung** verbindet drei Entitätsmengen miteinander. Sie ist nötig, wenn ein Zusammenhang nicht sinnvoll in mehrere binäre Beziehungen aufgespalten werden kann.
+
+**Beispiel**: Ein Arzt behandelt einen Patienten in einer bestimmten Klinik. Die Kombination aller drei Entitäten ergibt erst einen eindeutigen Sachverhalt.
+
+## Generalisierung und Spezialisierung
+
+**Generalisierung** fasst mehrere ähnliche Entitätsmengen zu einer übergeordneten Entitätsmenge zusammen. Umgekehrt beschreibt **Spezialisierung** die Aufteilung einer Entitätsmenge in Untertypen.
+
+Beispiel: Die Entitätsmenge *Person* kann in die Spezialisierungen *Kunde* und *Mitarbeiter* unterteilt werden. Gemeinsame Attribute (z. B. Name, Adresse) verbleiben bei *Person*, spezifische Attribute (z. B. Kundennummer, Mitarbeiternummer) werden den Untertypen zugeordnet.
+
+### Disjunkte vs. überlappende Spezialisierung
+
+- **Disjunkt**: Eine Entität gehört zu genau einem Untertyp.
+- **Überlappend**: Eine Entität kann mehreren Untertypen angehören.
+
+## Aggregation und Komposition
+
+- **Aggregation**: Eine schwache *Teil-von*-Beziehung. Die Teile können auch unabhängig existieren (z. B. Studierender in einer Vorlesung).
+- **Komposition**: Eine starke *Teil-von*-Beziehung. Die Teile existieren nicht ohne das Ganze (z. B. Bestellposition ohne Bestellung).
+
+In relationalen Datenbanken werden diese Konzepte typischerweise durch Fremdschlüssel und ggf. Löschweitergaben umgesetzt.

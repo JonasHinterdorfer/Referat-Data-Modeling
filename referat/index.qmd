@@ -1,0 +1,14 @@
+# DBI Referat: Data Modeling {.unnumbered}
+
+Dieses Referat behandelt das Thema **Data Modeling** im Rahmen des Unterrichts Datenbanken und Informationssysteme (DBI). Es werden grundlegende Konzepte, Notationen, Architekturen sowie moderne NoSQL-Modellierungsansätze vorgestellt und miteinander verglichen.
+
+## Gliederung
+
+1. Einführung und Motivation
+2. Drei-Schichten-Architektur
+3. Grundlagen des Entity-Relationship-Modells
+4. ER-Notationen im Vergleich
+5. Erweiterte Konzepte: Beziehungsattribute, ternäre Beziehungen, Generalisierung, Aggregation
+6. Konzeptionelles vs. logisches Modell
+7. NoSQL-Modellierung
+8. Fazit
