@@ -26,7 +26,8 @@ jobs:
 
       - name: Build Reveal.js and PDF
         run: |
-          nix develop --command quarto render
+          nix develop --command quarto render --to revealjs
+          nix develop --command quarto render --to pdf
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
