@@ -29,13 +29,12 @@ jobs:
 
       - name: Build Quarto site
         run: |
-          cd referat
           nix develop --command quarto render --to html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: referat/_book
+          path: _book
 
   deploy:
     needs: build
