@@ -1,6 +1,8 @@
 ---
 title: "DBI Referat: Data Modeling"
-author: "Dein Name"
+author:
+  - Jonas Hinterdorfer
+  - Simon Wögerbauer
 date: "2026-09-29"
 ---
 
