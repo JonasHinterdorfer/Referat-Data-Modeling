@@ -715,7 +715,7 @@ XML-Datenbanken bewahren die Struktur von XML-Dokumenten und unterstützen Abfra
 XML ist ein Baum. Verschachtelung entspricht einer Komposition: Die Positionen stecken in der Bestellung. Weil jedes Element nur ein Elternelement haben kann, lassen sich n:m-Beziehungen nicht verschachteln. Kunde und Produkt werden deshalb über IDs referenziert, in XML-Schema über ID und IDREF oder key und keyref. Das Schema selbst wird mit XSD festgelegt, das übernimmt die Rolle des logischen Modells.
 :::
 
-## Beziehungen im Vergleich
+## Beziehungen im Vergleich {.smaller}
 
 | | 1:n | n:m | Beziehungsattribut |
 |---|---|---|---|
