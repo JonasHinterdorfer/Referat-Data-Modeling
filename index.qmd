@@ -317,11 +317,39 @@ Jede Notation hat ihre Stärken. Chen ist anschaulich für konzeptionelle Modell
 
 ## Stärken und Schwächen
 
-| | Stärken | Schwächen |
-|---|---------|-----------|
-| Chen | Beziehungen und Beziehungsattribute klar sichtbar, n-äre Beziehungen | Viel Platz, wenig Toolunterstützung |
-| Crow's Foot | Kompakt, Kardinalitäten auf einen Blick, weit verbreitet | Keine n-ären Beziehungen, Beziehungsattribute nur über Hilfsentität |
-| UML | Standardisiert, Vererbung, Komposition, Aggregation | Nicht für Datenbanken gemacht, keine Schlüssel |
+:::: {.columns}
+
+::: {.column width="33%"}
+**Chen**
+
+✓ Anschaulich
+✓ Ternäre Beziehungen
+
+✗ Platzintensiv
+✗ Wenig Tools
+:::
+
+::: {.column width="33%"}
+**Crow's Foot**
+
+✓ Kompakt
+✓ Weit verbreitet
+
+✗ Nur binär
+✗ Keine Beziehungsattribute
+:::
+
+::: {.column width="33%"}
+**UML**
+
+✓ Standardisiert
+✓ Vererbung
+
+✗ Nicht für DBs
+✗ Keine Schlüssel
+:::
+
+::::
 
 ::: {.notes}
 Chen eignet sich am besten, um mit dem Fachbereich ein konzeptionelles Modell zu erarbeiten, wird aber bei großen Modellen schnell unübersichtlich. Crow's Foot ist das Standardwerkzeug für logische Modelle in der Praxis, kann aber ternäre Beziehungen und Beziehungsattribute nur über eine zusätzliche Entität darstellen. UML ist ideal, wenn das Datenmodell zusammen mit objektorientierter Software entworfen wird, kennt aber keine Primär- oder Fremdschlüssel.
