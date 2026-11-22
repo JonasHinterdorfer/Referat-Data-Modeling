@@ -20,7 +20,7 @@ date: "2026-11-23"
 - Praxis-Übung
 
 ::: {.notes}
-Heute geben wir einen kompakten Überblick über Data Modeling im DBI-Unterricht. Die detaillierten Erläuterungen stehen in den Speaker Notes und sollen nicht auf den Folien stehen.
+Hallo zusammen, wir sind Jonas Hinterdorfer und Simon Wögerbauer und unser Referat geht um Data Modeling. Wir fangen damit an, warum man Daten überhaupt modelliert und was ein ERD zeigt. Danach geht es um die Drei-Schichten-Architektur, die wichtigsten ER-Notationen und erweiterte Konzepte wie Vererbung oder ternäre Beziehungen. Im zweiten Teil schauen wir uns an, wie man vom konzeptionellen zum logischen Modell kommt und wie Modellierung bei NoSQL-Datenbanken funktioniert. Zum Schluss gibt es eine kleine Übung zum Mitmachen.
 :::
 
 # Einführung
@@ -860,3 +860,7 @@ Die Autoren werden mit Name eingebettet, weil ein Buch nur wenige Autoren hat, s
 ## Danke für eure Aufmerksamkeit!
 
 Fragen?
+
+::: {.notes}
+Danke fürs Zuhören. Habt ihr noch Fragen?
+:::
