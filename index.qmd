@@ -15,6 +15,7 @@ date: "2026-09-29"
 - Konzeptionell vs. logisch
 - NoSQL-Modellierung
 - Fazit
+- Praxis-Übung
 
 ::: {.notes}
 Heute geben wir einen kompakten Überblick über Data Modeling im DBI-Unterricht. Die detaillierten Erläuterungen stehen in den Speaker Notes und sollen nicht auf den Folien stehen.
@@ -560,15 +561,60 @@ Die Überführung vom ER-Modell in das relationale Modell folgt festen Regeln. J
 
 # NoSQL-Modellierung
 
-## Graph
+## Vom ERD zu NoSQL
 
-- Knoten und Kanten
-- Beispiel: Neo4j
-- Stärke: Beziehungsabfragen
-- Grenze: schlecht für Massendaten und Aggregationen
+- ERD bleibt Ausgangspunkt
+- Relational: erst Daten, dann Abfragen
+- NoSQL: erst Abfragen, dann Daten
+- Ziel: ein Zugriff = ein Lesevorgang
 
 ::: {.notes}
-Graphdatenbanken eignen sich für stark vernetzte Daten wie soziale Netzwerke, Empfehlungssysteme oder Betrugsaufdeckung. Sie sind sehr performant bei Beziehungsabfragen, aber weniger geeignet für große Mengen unstrukturierter Daten.
+Das konzeptionelle ERD ist bei NoSQL genauso sinnvoll wie bei relationalen Datenbanken, denn die fachlichen Zusammenhänge ändern sich nicht. Anders ist der Weg zum logischen Modell. Relational wird normalisiert und die Abfragen werden später mit Joins zusammengesetzt. Bei NoSQL fragt man zuerst: Welche Daten liest die Anwendung gemeinsam? Danach wird gespeichert, sodass eine typische Abfrage mit einem einzigen Zugriff beantwortet werden kann. Man nennt das abfragegetriebene Modellierung.
+:::
+
+## Aggregate bilden
+
+```{.plantuml caption="Onlineshop-ERD in Aggregate aufgeteilt"}
+@startuml
+left to right direction
+hide circle
+hide empty members
+skinparam packageStyle rectangle
+
+package "Aggregat Kunde" {
+  entity Kunde
+}
+
+package "Aggregat Bestellung" {
+  entity Bestellung
+  entity Bestellposition
+}
+
+package "Aggregat Produkt" {
+  entity Produkt
+}
+
+Kunde ||--o{ Bestellung
+Bestellung ||--|{ Bestellposition
+Produkt ||--o{ Bestellposition
+@enduml
+```
+
+::: {.notes}
+Wir nehmen das Onlineshop-ERD vom Anfang und fassen zusammen, was gemeinsam gelesen und geschrieben wird. Ein solcher Block heißt Aggregat. Bestellung und Bestellpositionen gehören zusammen, denn eine Position ohne Bestellung ist sinnlos und man liest immer die ganze Bestellung. Kunde und Produkt sind eigenständig. Beziehungen innerhalb eines Aggregats werden eingebettet, Beziehungen über Aggregatgrenzen hinweg werden zu Referenzen.
+:::
+
+## Einbetten oder referenzieren?
+
+| Einbetten | Referenzieren |
+|-----------|---------------|
+| Gemeinsam gelesen | Getrennt gelesen |
+| 1:1, 1:wenige | 1:viele, n:m |
+| Komposition | Aggregation |
+| Selten geändert | Oft geändert |
+
+::: {.notes}
+Diese Faustregeln entscheiden, ob Daten zusammen gespeichert werden. Einbetten lohnt sich, wenn Daten immer gemeinsam gelesen werden, wenn es nur wenige Kindelemente gibt und wenn die Teile ohne das Ganze nicht existieren, also bei einer Komposition. Referenzieren ist besser, wenn die Liste unbegrenzt wachsen kann, etwa alle Bestellungen eines Kunden, bei n:m-Beziehungen, und wenn sich die Daten oft ändern, weil man sonst viele Kopien aktualisieren müsste.
 :::
 
 ## Dokument
@@ -582,6 +628,64 @@ Graphdatenbanken eignen sich für stark vernetzte Daten wie soziale Netzwerke, E
 Dokumentenorientierte Datenbanken bieten flexible Schemafreiheit und sind gut horizontal skalierbar. Sie eignen sich für Content-Management, E-Commerce-Kataloge und mobile Anwendungen. Nachteilig sind mögliche Redundanzen und eingeschränkte Join-Operationen.
 :::
 
+## Dokument-Beispiel
+
+```json
+{
+  "_id": "B-1001",
+  "datum": "2026-09-29",
+  "kunde": { "id": 42, "name": "Anna Huber" },
+  "positionen": [
+    { "produktId": 7, "bezeichnung": "Maus", "preis": 19.90, "menge": 2 },
+    { "produktId": 9, "bezeichnung": "Tastatur", "preis": 49.00, "menge": 1 }
+  ]
+}
+```
+
+::: {.notes}
+Das ist das Aggregat Bestellung als ein Dokument. Die Positionen sind eingebettet, weil sie zur Bestellung gehören. Kunde und Produkt werden über ihre IDs referenziert. Zusätzlich werden Name, Bezeichnung und Preis kopiert. Das ist bewusste Redundanz: Die Bestellung lässt sich ohne weiteren Zugriff anzeigen und der Preis zum Bestellzeitpunkt bleibt erhalten, auch wenn sich der Produktpreis später ändert. Der Preis dafür: Ändert der Kunde seinen Namen, steht in alten Bestellungen noch der alte.
+:::
+
+## Graph
+
+- Knoten und Kanten
+- Beispiel: Neo4j
+- Stärke: Beziehungsabfragen
+- Grenze: schlecht für Massendaten und Aggregationen
+
+::: {.notes}
+Graphdatenbanken eignen sich für stark vernetzte Daten wie soziale Netzwerke, Empfehlungssysteme oder Betrugsaufdeckung. Sie sind sehr performant bei Beziehungsabfragen, aber weniger geeignet für große Mengen unstrukturierter Daten.
+:::
+
+## Graph-Beispiel
+
+```{.plantuml caption="Bestellung als Property-Graph"}
+@startuml
+left to right direction
+
+object "Kunde" as k {
+  name = "Anna Huber"
+}
+object "Bestellung" as b {
+  nr = "B-1001"
+}
+object "Produkt" as p1 {
+  bezeichnung = "Maus"
+}
+object "Produkt" as p2 {
+  bezeichnung = "Tastatur"
+}
+
+k --> b : HAT_AUFGEGEBEN
+b --> p1 : ENTHÄLT {menge: 2}
+b --> p2 : ENTHÄLT {menge: 1}
+@enduml
+```
+
+::: {.notes}
+Im Graphmodell werden Entitäten zu Knoten und Beziehungen zu Kanten. Kanten haben einen Namen und eigene Eigenschaften. Die Bestellposition, im relationalen Modell eine eigene Tabelle, verschwindet: Sie wird zur Kante ENTHÄLT mit der Eigenschaft menge. Beziehungsattribute aus der Chen-Notation landen also direkt auf der Kante. Das Graphmodell sieht fast so aus wie das ERD selbst, deshalb ist der Weg vom konzeptionellen zum logischen Modell hier am kürzesten.
+:::
+
 ## Key-Value
 
 - Einfache Schlüssel-Wert-Paare
@@ -593,6 +697,21 @@ Dokumentenorientierte Datenbanken bieten flexible Schemafreiheit und sind gut ho
 Key-Value-Datenbanken sind extrem schnell und einfach skalierbar. Sie werden für Caching, Session-Speicherung und Echtzeit-Rankings eingesetzt. Komplexe Abfragen oder Beziehungen zwischen Werten werden nicht unterstützt.
 :::
 
+## Key-Value-Beispiel
+
+```text
+kunde:42                →  { "name": "Anna Huber" }
+bestellung:B-1001       →  { "datum": "…", "positionen": […] }
+kunde:42:bestellungen   →  [ "B-1001", "B-1002" ]
+```
+
+- Beziehungen stecken im Schlüsselnamen
+- Pro Abfrage ein eigener Schlüssel
+
+::: {.notes}
+Die Datenbank kennt keine Beziehungen, nur Schlüssel und Werte. Beziehungen entstehen durch eine Namenskonvention wie kunde:42:bestellungen. Will die Anwendung alle Bestellungen eines Kunden anzeigen, braucht sie dafür einen eigenen Schlüssel mit der Liste der Bestellnummern. Für jede neue Abfrage braucht man einen neuen Schlüssel. Die Anwendung ist selbst dafür verantwortlich, alle diese Schlüssel konsistent zu halten.
+:::
+
 ## XML
 
 - Native XML-Speicherung
@@ -602,6 +721,37 @@ Key-Value-Datenbanken sind extrem schnell und einfach skalierbar. Sie werden fü
 
 ::: {.notes}
 XML-Datenbanken bewahren die Struktur von XML-Dokumenten und unterstützen Abfragen mit XPath oder XQuery. Sie werden in Dokumentenarchiven oder beim standardisierten Datenaustausch eingesetzt, haben aber einen höheren Speicherbedarf.
+:::
+
+## XML-Beispiel
+
+```xml
+<bestellung nr="B-1001" datum="2026-09-29" kunde="K42">
+  <position menge="2">
+    <produkt ref="P7">Maus</produkt>
+  </position>
+  <position menge="1">
+    <produkt ref="P9">Tastatur</produkt>
+  </position>
+</bestellung>
+```
+
+::: {.notes}
+XML ist ein Baum. Verschachtelung entspricht einer Komposition: Die Positionen stecken in der Bestellung. Weil jedes Element nur ein Elternelement haben kann, lassen sich n:m-Beziehungen nicht verschachteln. Kunde und Produkt werden deshalb über IDs referenziert, in XML-Schema über ID und IDREF oder key und keyref. Das Schema selbst wird mit XSD festgelegt, das übernimmt die Rolle des logischen Modells.
+:::
+
+## Beziehungen im Vergleich
+
+| | 1:n | n:m | Beziehungsattribut |
+|---|---|---|---|
+| Relational | Fremdschlüssel | Zwischentabelle | Spalte |
+| Dokument | Einbetten | ID-Liste | Feld |
+| Graph | Kante | Kante | Kanteneigenschaft |
+| Key-Value | Schlüsselname | Indexschlüssel | im Wert |
+| XML | Verschachtelung | IDREF | XML-Attribut |
+
+::: {.notes}
+Diese Tabelle fasst zusammen, wie dieselbe Beziehung aus dem ERD in jedem Modell umgesetzt wird. Relational ist alles über Schlüssel gelöst. Das Dokumentmodell bettet 1:n ein und referenziert bei n:m. Im Graph ist jede Beziehung eine Kante, egal welche Kardinalität. Bei Key-Value kümmert sich die Anwendung um alles. XML bildet 1:n über den Baum ab und braucht für n:m Referenzen.
 :::
 
 ## NoSQL-Modelle im Vergleich
@@ -653,6 +803,83 @@ Es gibt kein universell bestes Datenmodell. Relationale Datenbanken bleiben für
 
 ::: {.notes}
 Zusammenfassend ist Data Modeling ein fundamentales Hilfsmittel für verständliche, konsistente und wartbare Informationssysteme. Ein gut erstelltes ERD bildet die Grundlage für die spätere Implementierung und erleichtert die Kommunikation zwischen allen Beteiligten.
+:::
+
+# Praxis
+
+## Übung: Bibliothek
+
+- Mitglieder leihen Bücher aus
+- Jede Ausleihe hat ein Datum
+- Ein Buch hat mehrere Autoren
+
+1. ERD in Crow's Foot zeichnen
+2. Beziehungsattribut finden
+3. Buch als Dokument: was einbetten?
+
+::: {.notes}
+Jetzt seid ihr dran. Nehmt euch ein paar Minuten und modelliert die Bibliothek. Zuerst das ERD in Crow's Foot, dann überlegen, welches Attribut zu einer Beziehung gehört und nicht zu einer Entität. Zum Schluss: Wie würdet ihr ein Buch in MongoDB speichern, was wird eingebettet und was referenziert?
+:::
+
+## Lösung: ERD
+
+```{.plantuml caption="Bibliothek in Crow's Foot"}
+@startuml
+left to right direction
+hide circle
+
+entity Mitglied {
+  * MitgliedNr <<PK>>
+  --
+  * Name
+}
+
+entity Ausleihe {
+  * MitgliedNr <<FK>>
+  * ISBN <<FK>>
+  * Datum
+}
+
+entity Buch {
+  * ISBN <<PK>>
+  --
+  * Titel
+}
+
+entity Autor {
+  * AutorNr <<PK>>
+  --
+  * Name
+}
+
+Mitglied ||--o{ Ausleihe
+Ausleihe }o--|| Buch
+Buch }|--|{ Autor : geschrieben von
+@enduml
+```
+
+::: {.notes}
+Mitglied und Buch stehen in einer n:m-Beziehung. Das Datum ist das Beziehungsattribut, es gehört weder zum Mitglied noch zum Buch, sondern zur einzelnen Ausleihe. Weil Crow's Foot keine Beziehungsattribute kennt, wird daraus die Hilfsentität Ausleihe. Buch und Autor sind ebenfalls n:m, im logischen Modell braucht es dafür eine Zwischentabelle.
+:::
+
+## Lösung: Dokument
+
+```json
+{
+  "_id": "978-3-16-148410-0",
+  "titel": "Datenbanksysteme",
+  "autoren": [
+    { "id": 3, "name": "A. Kemper" },
+    { "id": 8, "name": "A. Eickler" }
+  ]
+}
+```
+
+- Autoren eingebettet: wenige, selten geändert
+- Ausleihen referenziert: wachsen unbegrenzt
+
+::: {.notes}
+Die Autoren werden mit Name eingebettet, weil ein Buch nur wenige Autoren hat, sie immer mit dem Buch angezeigt werden und sich Autorennamen praktisch nie ändern. Die Ausleihen kommen in eine eigene Collection mit Verweis auf Buch und Mitglied, denn ein Buch wird über die Jahre unzählige Male ausgeliehen und das Dokument würde sonst unbegrenzt wachsen.
 :::
 
 ## Danke für eure Aufmerksamkeit!
