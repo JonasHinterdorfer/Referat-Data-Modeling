@@ -200,6 +200,34 @@ Kardinalitäten geben an, wie viele Entitäten an einer Beziehung beteiligt sein
 Die Chen-Notation bietet eine klare Trennung zwischen Entitäten, Beziehungen und Attributen. Sie ist besonders gut für konzeptionelle Modelle geeignet, wird aber in kommerziellen Tools seltener unterstützt und kann bei vielen Entitäten unübersichtlich werden.
 :::
 
+## Beispiel: Chen
+
+```{.plantuml caption="Kunde gibt Bestellung auf – Chen-Notation"}
+@startchen
+left to right direction
+
+entity Kunde {
+  KundenNr <<key>>
+  Name
+}
+
+entity Bestellung {
+  BestellNr <<key>>
+  Datum
+}
+
+relationship gibt_auf {
+}
+
+Kunde -1- gibt_auf
+gibt_auf -N- Bestellung
+@endchen
+```
+
+::: {.notes}
+Alle drei Notationen zeigen dasselbe Beispiel: Ein Kunde gibt beliebig viele Bestellungen auf, jede Bestellung gehört zu genau einem Kunden. In der Chen-Notation ist die Beziehung „gibt auf" eine eigene Raute, die Attribute hängen als Ellipsen an den Entitäten. Unterstrichene Attribute sind Schlüssel. Die Kardinalitäten 1 und N stehen an den Verbindungslinien.
+:::
+
 ## Crow's Foot
 
 - Strich = 1
@@ -210,21 +238,32 @@ Die Chen-Notation bietet eine klare Trennung zwischen Entitäten, Beziehungen un
 Crow's Foot ist besonders in Tools wie Microsoft Visio oder draw.io verbreitet. Die krähenfußartigen Symbole machen Kardinalitäten auf einen Blick erkennbar. Attribute werden meist als Listen neben dem Entitätsrechteck dargestellt.
 :::
 
-## Notationen im Vergleich
+## Beispiel: Crow's Foot
 
-```{.plantuml caption="Vergleich der Notationen am Beispiel Kunde bestellt Produkt"}
+```{.plantuml caption="Kunde gibt Bestellung auf – Crow's Foot"}
 @startuml
 left to right direction
+hide circle
 
-entity Kunde
-entity Produkt
+entity Kunde {
+  * KundenNr : Integer <<PK>>
+  --
+  * Name : String
+}
 
-Kunde "1" -- "n" Produkt : bestellt
+entity Bestellung {
+  * BestellNr : Integer <<PK>>
+  --
+  * Datum : Date
+  * KundenNr : Integer <<FK>>
+}
+
+Kunde ||--o{ Bestellung : gibt auf
 @enduml
 ```
 
 ::: {.notes}
-Dieses einfache Beispiel zeigt eine 1:n-Beziehung. In der Chen-Notation würde „bestellt" als Raute dargestellt, in Crow's Foot als Linie mit entsprechenden Symbolen, in UML als Assoziation mit Multiplizitäten.
+Dasselbe Beispiel in Crow's Foot. Die zwei Striche beim Kunden bedeuten „genau ein Kunde", der Kreis mit Krähenfuß bei der Bestellung bedeutet „null bis viele Bestellungen". Die Beziehung ist nur noch eine beschriftete Linie, Attribute stehen als Liste im Rechteck. Weil oft schon Datentypen und Fremdschlüssel eingetragen werden, liegt Crow's Foot näher am logischen Modell.
 :::
 
 ## UML
@@ -237,16 +276,55 @@ Dieses einfache Beispiel zeigt eine 1:n-Beziehung. In der Chen-Notation würde �
 UML-Klassendiagramme werden oft in der objektorientierten Softwareentwicklung verwendet. Sie unterstützen Vererbung, Assoziationen und Kompositionen direkt und haben eine breite Toolunterstützung. Allerdings sind sie nicht speziell für Datenbanken entwickelt.
 :::
 
+## Beispiel: UML
+
+```{.plantuml caption="Kunde gibt Bestellung auf – UML-Klassendiagramm"}
+@startuml
+left to right direction
+hide circle
+hide methods
+
+class Kunde {
+  kundenNr : Integer
+  name : String
+}
+
+class Bestellung {
+  bestellNr : Integer
+  datum : Date
+}
+
+Kunde "1" -- "0..*" Bestellung : gibt auf >
+@enduml
+```
+
+::: {.notes}
+Dasselbe Beispiel als UML-Klassendiagramm. Entitäten werden zu Klassen, Attribute zu Feldern. Die Kardinalität steht als Multiplizität an den Enden der Assoziation: 1 auf der Seite des Kunden, 0..* auf der Seite der Bestellung. Der Pfeil gibt die Leserichtung an. Fremdschlüssel kommen in UML nicht vor, die Verbindung entsteht über die Assoziation.
+:::
+
 ## Vergleich
 
 | Kriterium | Chen | Crow's Foot | UML |
 |-----------|------|-------------|-----|
 | Entitäten | Rechtecke | Rechtecke | Klassen |
 | Attribute | Ellipsen | Listen | Felder |
-| Eignung | Konzeptionell | Praktisch | OO-Projekte |
+| Beziehungen | Rauten | Linien | Assoziationen |
+| Eignung | Konzeptionell | Logisch, Praxis | OO-Projekte |
 
 ::: {.notes}
 Jede Notation hat ihre Stärken. Chen ist anschaulich für konzeptionelle Modelle, Crow's Foot ist kompakt und weit verbreitet, UML passt gut in objektorientierte Projekte. Die Wahl hängt vom Kontext und den verwendeten Tools ab.
+:::
+
+## Stärken und Schwächen
+
+| | Stärken | Schwächen |
+|---|---------|-----------|
+| Chen | Beziehungen und Beziehungsattribute klar sichtbar, n-äre Beziehungen | Viel Platz, wenig Toolunterstützung |
+| Crow's Foot | Kompakt, Kardinalitäten auf einen Blick, weit verbreitet | Keine n-ären Beziehungen, Beziehungsattribute nur über Hilfsentität |
+| UML | Standardisiert, Vererbung, Komposition, Aggregation | Nicht für Datenbanken gemacht, keine Schlüssel |
+
+::: {.notes}
+Chen eignet sich am besten, um mit dem Fachbereich ein konzeptionelles Modell zu erarbeiten, wird aber bei großen Modellen schnell unübersichtlich. Crow's Foot ist das Standardwerkzeug für logische Modelle in der Praxis, kann aber ternäre Beziehungen und Beziehungsattribute nur über eine zusätzliche Entität darstellen. UML ist ideal, wenn das Datenmodell zusammen mit objektorientierter Software entworfen wird, kennt aber keine Primär- oder Fremdschlüssel.
 :::
 
 # Erweiterte Konzepte
@@ -260,6 +338,36 @@ Jede Notation hat ihre Stärken. Chen ist anschaulich für konzeptionelle Modell
 Nicht jedes Attribut gehört einer Entität an. Die Menge oder das Bestelldatum sind Eigenschaften der Beziehung zwischen Kunde und Produkt, da sie erst durch die Kombination beider Entitäten einen Sinn ergeben.
 :::
 
+## Beziehungsattribut-Diagramm
+
+```{.plantuml caption="Menge und Datum als Attribute der Beziehung bestellt (Chen)"}
+@startchen
+left to right direction
+
+entity Kunde {
+  KundenNr <<key>>
+  Name
+}
+
+entity Produkt {
+  ProduktNr <<key>>
+  Bezeichnung
+}
+
+relationship bestellt {
+  Menge
+  Datum
+}
+
+Kunde -M- bestellt
+bestellt -N- Produkt
+@endchen
+```
+
+::: {.notes}
+Menge und Datum hängen hier an der Raute und nicht an einer Entität. Würde man die Menge beim Produkt speichern, gäbe es nur eine Menge pro Produkt, egal welcher Kunde bestellt. Beim Kunden gäbe es nur eine Menge pro Kunde. Erst die Kombination aus Kunde und Produkt bestimmt die Menge. Im relationalen Modell wird daraus eine eigene Tabelle Bestellung mit den Fremdschlüsseln KundenNr und ProduktNr sowie den Spalten Menge und Datum.
+:::
+
 ## Ternäre Beziehungen
 
 - Verbinden drei Entitätsmengen
@@ -267,6 +375,40 @@ Nicht jedes Attribut gehört einer Entität an. Die Menge oder das Bestelldatum 
 
 ::: {.notes}
 Manche Zusammenhänge lassen sich nicht sinnvoll in mehrere binäre Beziehungen aufteilen. Ein Arzt behandelt einen Patienten in einer bestimmten Klinik. Erst die Kombination aller drei Entitäten ergibt einen eindeutigen Sachverhalt.
+:::
+
+## Ternäre Beziehung-Diagramm
+
+```{.plantuml caption="Arzt behandelt Patient in Klinik (Chen)"}
+@startchen
+
+entity Arzt {
+  ArztNr <<key>>
+  Name
+}
+
+entity Patient {
+  SVNr <<key>>
+  Name
+}
+
+entity Klinik {
+  KlinikNr <<key>>
+  Ort
+}
+
+relationship behandelt {
+  Datum
+}
+
+Arzt -N- behandelt
+behandelt -M- Patient
+behandelt -P- Klinik
+@endchen
+```
+
+::: {.notes}
+Eine Raute verbindet alle drei Entitäten. Ein einzelner Eintrag sagt: Dieser Arzt hat diesen Patienten in dieser Klinik behandelt. Zerlegt man das in drei binäre Beziehungen (Arzt–Patient, Arzt–Klinik, Patient–Klinik), geht Information verloren: Man weiß dann zwar, dass der Arzt in zwei Kliniken arbeitet und den Patienten behandelt hat, aber nicht mehr, in welcher Klinik. Im relationalen Modell wird daraus eine Tabelle mit drei Fremdschlüsseln. Crow's Foot kann ternäre Beziehungen nicht direkt darstellen und braucht dafür eine Hilfsentität.
 :::
 
 ## Generalisierung & Spezialisierung
@@ -322,6 +464,39 @@ In diesem Diagramm erben Kunde und Mitarbeiter die Attribute von Person. Die Spe
 Bei einer Aggregation können die Teile auch unabhängig vom Ganzen existieren, zum Beispiel Studierende in einer Vorlesung. Bei einer Komposition existieren die Teile nicht ohne das Ganze, zum Beispiel Bestellpositionen ohne Bestellung.
 :::
 
+## Aggregation & Komposition-Diagramm
+
+```{.plantuml caption="Aggregation (leere Raute) und Komposition (gefüllte Raute) in UML"}
+@startuml
+left to right direction
+hide circle
+hide methods
+
+class Vorlesung {
+  titel : String
+}
+
+class Student {
+  matrikelNr : Integer
+}
+
+class Bestellung {
+  bestellNr : Integer
+}
+
+class Bestellposition {
+  menge : Integer
+}
+
+Vorlesung "0..*" o-- "0..*" Student : besucht <
+Bestellung "1" *-- "1..*" Bestellposition : enthält >
+@enduml
+```
+
+::: {.notes}
+Die leere Raute steht für Aggregation: Wird die Vorlesung gelöscht, existieren die Studierenden weiter und können andere Vorlesungen besuchen. Die gefüllte Raute steht für Komposition: Wird die Bestellung gelöscht, verschwinden auch ihre Positionen. In der Datenbank entspricht die Komposition einem Fremdschlüssel mit ON DELETE CASCADE, die Aggregation einer normalen Beziehung ohne kaskadierendes Löschen.
+:::
+
 # Konzeptionell vs. Logisch
 
 ## Konzeptionell
@@ -361,6 +536,8 @@ Die Überführung vom ER-Modell in das relationale Modell folgt festen Regeln. J
 
 - Knoten und Kanten
 - Beispiel: Neo4j
+- Stärke: Beziehungsabfragen
+- Grenze: schlecht für Massendaten und Aggregationen
 
 ::: {.notes}
 Graphdatenbanken eignen sich für stark vernetzte Daten wie soziale Netzwerke, Empfehlungssysteme oder Betrugsaufdeckung. Sie sind sehr performant bei Beziehungsabfragen, aber weniger geeignet für große Mengen unstrukturierter Daten.
@@ -370,6 +547,8 @@ Graphdatenbanken eignen sich für stark vernetzte Daten wie soziale Netzwerke, E
 
 - JSON/BSON-Dokumente
 - Beispiel: MongoDB
+- Stärke: flexibles Schema, skalierbar
+- Grenze: Redundanz, kaum Joins
 
 ::: {.notes}
 Dokumentenorientierte Datenbanken bieten flexible Schemafreiheit und sind gut horizontal skalierbar. Sie eignen sich für Content-Management, E-Commerce-Kataloge und mobile Anwendungen. Nachteilig sind mögliche Redundanzen und eingeschränkte Join-Operationen.
@@ -379,6 +558,8 @@ Dokumentenorientierte Datenbanken bieten flexible Schemafreiheit und sind gut ho
 
 - Einfache Schlüssel-Wert-Paare
 - Beispiel: Redis
+- Stärke: extrem schnell
+- Grenze: nur Zugriff über den Schlüssel
 
 ::: {.notes}
 Key-Value-Datenbanken sind extrem schnell und einfach skalierbar. Sie werden für Caching, Session-Speicherung und Echtzeit-Rankings eingesetzt. Komplexe Abfragen oder Beziehungen zwischen Werten werden nicht unterstützt.
@@ -388,6 +569,8 @@ Key-Value-Datenbanken sind extrem schnell und einfach skalierbar. Sie werden fü
 
 - Native XML-Speicherung
 - Beispiel: BaseX
+- Stärke: XPath/XQuery, Standards
+- Grenze: hoher Speicherbedarf
 
 ::: {.notes}
 XML-Datenbanken bewahren die Struktur von XML-Dokumenten und unterstützen Abfragen mit XPath oder XQuery. Sie werden in Dokumentenarchiven oder beim standardisierten Datenaustausch eingesetzt, haben aber einen höheren Speicherbedarf.
@@ -424,6 +607,7 @@ Die Wahl des Datenmodells hängt von den Zugriffsmustern und Anforderungen ab. M
 | Vernetzte Daten | Graph |
 | Flexible Daten | Dokument |
 | Hohe Lesegeschwindigkeit | Key-Value |
+| Standardisierter Dokumentenaustausch | XML |
 | Komplexe Transaktionen | Relational |
 
 ::: {.notes}
